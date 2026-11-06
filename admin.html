@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="en" class="dark scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEBORA | Admin Portal</title>
+
+    <!-- Google Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Montserrat:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#09090b',
+                        darkCard: '#12121a',
+                        purpleGlow: '#a855f7',
+                        purplePrimary: '#7c3aed',
+                        indigoGlow: '#6366f1',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        brand: ['Montserrat', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #09090b;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .glass-panel {
+            background: rgba(18, 18, 26, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(168, 85, 247, 0.15);
+        }
+
+        .glass-nav {
+            background: rgba(9, 9, 11, 0.85);
+            backdrop-filter: blur(14px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #ffffff 0%, #d8b4fe 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #27272a;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #7c3aed;
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-purplePrimary selection:text-white relative min-h-screen pb-20">
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 w-full z-50 glass-nav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-2 sm:gap-4">
+                <span class="font-brand text-2xl sm:text-3xl font-extrabold tracking-wider text-gradient">WEBORA</span>
+                <span
+                    class="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-purplePrimary/20 border border-purplePrimary/30 text-[10px] sm:text-xs font-bold text-purpleGlow uppercase tracking-widest hidden sm:block">Admin
+                    CMS</span>
+            </div>
+            <div class="flex items-center gap-2 sm:gap-4">
+                <a href="index.html" target="_blank"
+                    class="text-sm font-semibold text-gray-300 hover:text-white transition flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">View
+                        Site</span>
+                </a>
+                <button onclick="resetAllData()"
+                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs sm:text-sm font-bold transition"
+                    title="Reset to Default">
+                    Reset
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 space-y-6 sm:space-y-8">
+
+        <!-- Tab Navigation -->
+        <div class="flex overflow-x-auto border-b border-white/10 gap-4 sm:gap-6 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+            <button onclick="switchTab('inquiries')" id="tab-inquiries"
+                class="whitespace-nowrap pb-2 text-sm font-bold text-purpleGlow border-b-2 border-purpleGlow transition">Inquiries</button>
+            <button onclick="switchTab('settings')" id="tab-settings"
+                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Settings</button>
+            <button onclick="switchTab('packages')" id="tab-packages"
+                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Packages</button>
+            <button onclick="switchTab('services')" id="tab-services"
+                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Services</button>
+            <button onclick="switchTab('portfolio')" id="tab-portfolio"
+                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Portfolio</button>
+            <button onclick="switchTab('reviews')" id="tab-reviews"
+                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Reviews</button>
+        </div>
+
+        <!-- TAB: INQUIRIES -->
+        <div id="content-inquiries" class="space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-xl sm:text-2xl font-bold text-white">Recent Inquiries</h2>
+                <button onclick="clearInquiries()" class="text-xs text-red-400 hover:text-red-300 font-semibold"><i
+                        class="fa-solid fa-trash-can mr-1"></i> Clear All</button>
+            </div>
+            <div id="inquiriesList" class="grid grid-cols-1 gap-4"></div>
+        </div>
+
+        <!-- TAB: SITE SETTINGS -->
+        <div id="content-settings" class="space-y-8 hidden">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-purpleGlow"></i> Global Site Settings
+                </h2>
+                <form id="settingsForm" onsubmit="saveSettings(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Hero Main Title</label>
+                            <input type="text" id="setHeroTitle"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Hero Subtitle</label>
+                            <input type="text" id="setHeroSub"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Contact Email</label>
+                            <input type="email" id="setEmail"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Contact Phone /
+                                WhatsApp</label>
+                            <input type="text" id="setPhone"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp Link (e.g.,
+                                https://wa.me/94789491209)</label>
+                            <input type="text" id="setWhatsApp"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">TikTok Profile Link (e.g.,
+                                https://tiktok.com/@webora)</label>
+                            <input type="text" id="setTikTok"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                    </div>
+                    <button type="submit"
+                        class="w-full md:w-auto px-8 py-3 rounded-xl bg-purplePrimary text-white font-bold text-sm hover:bg-purpleGlow transition">
+                        Save Settings
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TAB: PACKAGES -->
+        <div id="content-packages" class="space-y-8 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="packagesAdminGrid"></div>
+        </div>
+
+        <!-- TAB: SERVICES -->
+        <div id="content-services" class="space-y-8 hidden">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="servicesAdminGrid"></div>
+        </div>
+
+        <!-- TAB: PORTFOLIO -->
+        <div id="content-portfolio" class="space-y-8 hidden">
+            <!-- Add Project Form -->
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-plus-circle text-purpleGlow"></i> Add New Project
+                </h2>
+                <form id="projectForm" onsubmit="handleAddProject(event)" class="space-y-5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Project Title *</label>
+                            <input type="text" id="projTitle" required placeholder="e.g. My Awesome App"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Category Tag *</label>
+                            <input type="text" id="projTag" required placeholder="e.g. saas"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-300 mb-1">Short Description *</label>
+                        <textarea id="projDesc" required rows="2" placeholder="Brief description..."
+                            class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition"></textarea>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Tech Stack (Comma separated)
+                                *</label>
+                            <input type="text" id="projTech" required placeholder="React, Node.js"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Cover Icon (FontAwesome class)
+                                *</label>
+                            <input type="text" id="projIcon" required placeholder="fa-solid fa-rocket"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        </div>
+                    </div>
+                    <div class="border-t border-white/10 pt-5 mt-5">
+                        <label class="block text-xs font-semibold text-purpleGlow mb-2 flex items-center gap-2">
+                            <i class="fa-solid fa-code"></i> Paste Demo Code (HTML/CSS/JS) *
+                        </label>
+                        <textarea id="projCode" required rows="10"
+                            placeholder="<html>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>"
+                            class="w-full px-4 py-3 rounded-xl bg-[#09090b] border border-white/10 text-emerald-400 font-mono text-sm focus:outline-none focus:border-purpleGlow transition leading-relaxed"></textarea>
+                    </div>
+                    <button type="submit"
+                        class="w-full py-4 rounded-xl bg-gradient-to-r from-purplePrimary to-indigoGlow text-white font-bold text-sm shadow-lg shadow-purplePrimary/30 hover:opacity-95 transition flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Publish Project
+                    </button>
+                </form>
+            </div>
+
+            <!-- Existing Projects List -->
+            <div>
+                <h2 class="text-xl font-bold text-white mb-4">Published Projects</h2>
+                <div id="projectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+
+        <!-- TAB: REVIEWS -->
+        <div id="content-reviews" class="space-y-8 hidden">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="fa-solid fa-star text-amber-400"></i> Manage Client Reviews
+                </h2>
+                <!-- Add Review Form -->
+                <form onsubmit="handleAddReview(event)"
+                    class="space-y-4 mb-8 p-4 sm:p-6 bg-black/30 rounded-2xl border border-white/5">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <input type="text" id="revName" required placeholder="Client Name"
+                            class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        <input type="text" id="revCompany" required placeholder="Company / Role"
+                            class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                    </div>
+                    <textarea id="revComment" required rows="2" placeholder="Review message..."
+                        class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition"></textarea>
+                    <button type="submit"
+                        class="px-6 py-2 rounded-xl bg-purplePrimary text-white font-bold text-sm hover:bg-purpleGlow transition w-full sm:w-auto">
+                        Add Review
+                    </button>
+                </form>
+
+                <div id="reviewsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast"
+        class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel border-emerald-500/50 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl max-w-[90vw]">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
+        <div>
+            <div id="toastTitle" class="font-bold text-white text-sm">Success</div>
+            <div id="toastMessage" class="text-xs text-gray-300">Changes saved.</div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- DEFAULT DATA SETUP ---
+        const defaultSettings = {
+            heroTitle: "Crafting Next-Gen Digital Experiences",
+            heroSub: "Webora is a premier web development agency delivering high-speed web apps, custom corporate sites, and modern e-commerce solutions built to scale your brand.",
+            email: "weboradev@gmail.com",
+            phone: "0789491209",
+            whatsapp: "https://wa.me/94789491209",
+            tiktok: "https://tiktok.com/@webora"
+        };
+
+        const defaultPackages = [
+            { id: "p1", tier: "Starter Package", subtitle: "Personal & Landing Pages", desc: "Perfect for personal portfolios, landing pages, and small projects.", price: "LKR 9,500", tax: "* No hidden fees", domain: "yourname.github.io", features: ["Free GitHub Pages web hosting setup", "Mobile-Responsive Design", "Basic On-Page SEO"], featured: false },
+            { id: "p2", tier: "Small Business", subtitle: "E-Commerce Store", desc: "Perfect for small stores selling products/services online.", price: "LKR 14,500", tax: "* Custom domain included", domain: "yourstore.com", features: ["Product listing & management", "WhatsApp / Online order system", "SEO setup included"], featured: true },
+            { id: "p3", tier: "Premium Package", subtitle: "Custom Web App", desc: "Full custom AI-enhanced PHP web app with custom database features.", price: "LKR 30,000", tax: "* Full configuration included", domain: "yourcompany.com", features: ["AI-Enhanced PHP Web App", "Custom Database Architecture", "Custom domain & hosting integration"], featured: false },
+            { id: "p4", tier: "Custom Build", subtitle: "Command the Developer", desc: "Tell me exactly what you need. I'll build it from scratch, feature by feature, just the way you command.", price: "Let's Talk", tax: "* Priced based on your commands", domain: "You set the rules", features: ["Completely custom features", "Bespoke integrations", "Built to your exact specs"], featured: false }
+        ];
+
+        const defaultServices = [
+            { id: "s1", title: "Custom Websites", desc: "Beautiful, tailor-made websites built from scratch to perfectly match your brand and goals.", features: ["Unique designs (no templates)", "Works perfectly on phones & tablets", "Easy to update yourself"], icon: "fa-solid fa-laptop-code", color: "text-purpleGlow" },
+            { id: "s2", title: "Online Stores", desc: "Simple and secure e-commerce setups so you can start selling your products online quickly.", features: ["Easy product management", "Secure local & international payments", "Simple checkout process"], icon: "fa-solid fa-store", color: "text-indigo-400" },
+            { id: "s3", title: "Web Apps & Portals", desc: "Custom tools, client portals, or booking systems built to automate your business.", features: ["Custom user logins & dashboards", "Booking & reservation systems", "Connect to your existing tools"], icon: "fa-solid fa-gears", color: "text-emerald-400" },
+            { id: "s4", title: "Speed & SEO", desc: "Make your site load instantly and rank higher on Google so more people find you.", features: ["Lightning-fast load times", "Google search optimization", "Fix broken links & errors"], icon: "fa-solid fa-bolt", color: "text-purpleGlow" },
+            { id: "s5", title: "UI/UX Design", desc: "Clean, modern layouts designed to make your business look professional and trustworthy.", features: ["Beautiful, modern visual design", "Easy-to-use navigation", "Layouts built to get more leads"], icon: "fa-solid fa-pen-nib", color: "text-indigo-400" },
+            { id: "s6", title: "Maintenance & Support", desc: "We keep your website secure, updated, and running smoothly so you don't have to worry.", features: ["Regular software updates", "Daily backups & security checks", "Quick fixes if anything breaks"], icon: "fa-solid fa-shield-halved", color: "text-emerald-400" }
+        ];
+
+        const defaultReviews = [
+            { name: "Dinesh Perera", company: "Founder, LuxeCeylon", comment: "WEBORA transformed our e-commerce site. Our page load speed dropped under 1 second, and online sales increased significantly within weeks!", initial: "DS", color: "bg-purplePrimary" },
+            { name: "Sarah Jayawardena", company: "CMO, Apex Holdings", comment: "The design aesthetic and dark purple glowing theme they executed for our portal were stunning. Fast response times on WhatsApp throughout.", initial: "SJ", color: "bg-indigo-600" },
+            { name: "Roshan Nizar", company: "CTO, PulseAnalytics", comment: "Delivered our web application ahead of schedule with spotless code architecture. Highly recommended team for complex projects.", initial: "RN", color: "bg-emerald-600" }
+        ];
+
+        // --- INITIALIZATION ---
+        function initializeData() {
+            if (!localStorage.getItem('webora_inquiries')) localStorage.setItem('webora_inquiries', JSON.stringify([]));
+            if (!localStorage.getItem('webora_custom_projects')) localStorage.setItem('webora_custom_projects', JSON.stringify([]));
+            if (!localStorage.getItem('webora_settings')) localStorage.setItem('webora_settings', JSON.stringify(defaultSettings));
+            if (!localStorage.getItem('webora_packages')) localStorage.setItem('webora_packages', JSON.stringify(defaultPackages));
+            if (!localStorage.getItem('webora_services')) localStorage.setItem('webora_services', JSON.stringify(defaultServices));
+            if (!localStorage.getItem('webora_reviews')) localStorage.setItem('webora_reviews', JSON.stringify(defaultReviews));
+        }
+
+        // --- TAB SWITCHING ---
+        function switchTab(tab) {
+            const tabs = ['inquiries', 'settings', 'packages', 'services', 'portfolio', 'reviews'];
+            tabs.forEach(t => {
+                document.getElementById(`content-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).classList.remove('text-purpleGlow', 'border-purpleGlow');
+                document.getElementById(`tab-${t}`).classList.add('text-gray-400', 'border-transparent');
+            });
+
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('text-purpleGlow', 'border-purpleGlow');
+            document.getElementById(`tab-${tab}`).classList.remove('text-gray-400', 'border-transparent');
+
+            if (tab === 'settings') loadSettings();
+            if (tab === 'packages') renderPackagesAdmin();
+            if (tab === 'services') renderServicesAdmin();
+            if (tab === 'inquiries') renderInquiries();
+            if (tab === 'portfolio') renderProjects();
+            if (tab === 'reviews') renderReviewsAdmin();
+        }
+
+        // --- RENDER INQUIRIES ---
+        function renderInquiries() {
+            const container = document.getElementById('inquiriesList');
+            const inquiries = JSON.parse(localStorage.getItem('webora_inquiries') || '[]');
+
+            if (inquiries.length === 0) {
+                container.innerHTML = `<div class="glass-panel p-8 rounded-2xl text-center text-gray-400"><i class="fa-solid fa-inbox text-4xl mb-4 text-gray-600"></i><p>No inquiries yet.</p></div>`;
+                return;
+            }
+
+            container.innerHTML = inquiries.map((inq, index) => `
+                <div class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-purplePrimary relative group">
+                    <div class="flex justify-between items-start mb-4 gap-2">
+                        <div>
+                            <div class="text-base sm:text-lg font-bold text-white">${inq.name}</div>
+                            <div class="text-xs text-purpleGlow font-mono mt-1"><i class="fa-solid fa-tag mr-1"></i> ${inq.service}</div>
+                        </div>
+                        <span class="text-[10px] sm:text-xs text-gray-500 bg-white/5 px-2 py-1 rounded whitespace-nowrap">${inq.date}</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-300 mb-4">
+                        <div class="truncate"><i class="fa-solid fa-envelope text-gray-500 mr-2"></i> ${inq.email}</div>
+                        <div><i class="fa-solid fa-phone text-gray-500 mr-2"></i> ${inq.phone || 'N/A'}</div>
+                    </div>
+                    <div class="bg-black/30 p-3 rounded-xl text-xs sm:text-sm text-gray-300 italic border border-white/5">"${inq.message}"</div>
+                    <button onclick="deleteInquiry(${index})" class="absolute top-4 right-4 text-gray-500 hover:text-red-400 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity p-2"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function deleteInquiry(index) {
+            const inquiries = JSON.parse(localStorage.getItem('webora_inquiries') || '[]');
+            inquiries.splice(index, 1);
+            localStorage.setItem('webora_inquiries', JSON.stringify(inquiries));
+            renderInquiries();
+        }
+
+        function clearInquiries() {
+            if (confirm("Clear all inquiries?")) {
+                localStorage.setItem('webora_inquiries', JSON.stringify([]));
+                renderInquiries();
+            }
+        }
+
+        // --- SETTINGS MANAGER ---
+        function loadSettings() {
+            const settings = JSON.parse(localStorage.getItem('webora_settings') || JSON.stringify(defaultSettings));
+            document.getElementById('setHeroTitle').value = settings.heroTitle;
+            document.getElementById('setHeroSub').value = settings.heroSub;
+            document.getElementById('setEmail').value = settings.email;
+            document.getElementById('setPhone').value = settings.phone;
+            document.getElementById('setWhatsApp').value = settings.whatsapp;
+            document.getElementById('setTikTok').value = settings.tiktok || "";
+        }
+
+        function saveSettings(e) {
+            e.preventDefault();
+            const newSettings = {
+                heroTitle: document.getElementById('setHeroTitle').value,
+                heroSub: document.getElementById('setHeroSub').value,
+                email: document.getElementById('setEmail').value,
+                phone: document.getElementById('setPhone').value,
+                whatsapp: document.getElementById('setWhatsApp').value,
+                tiktok: document.getElementById('setTikTok').value,
+            };
+            localStorage.setItem('webora_settings', JSON.stringify(newSettings));
+            showToast("Settings Saved!", "Your site configurations have been updated.");
+        }
+
+        // --- PACKAGES MANAGER ---
+        function renderPackagesAdmin() {
+            const container = document.getElementById('packagesAdminGrid');
+            const packages = JSON.parse(localStorage.getItem('webora_packages') || JSON.stringify(defaultPackages));
+
+            container.innerHTML = packages.map((pkg, index) => `
+                <div class="glass-panel p-5 sm:p-6 rounded-2xl border-white/10 space-y-4">
+                    <div class="flex justify-between items-center border-b border-white/10 pb-2">
+                        <h3 class="text-base sm:text-lg font-bold text-white">${pkg.tier}</h3>
+                        ${pkg.featured ? '<span class="text-[10px] bg-purplePrimary/20 text-purpleGlow px-2 py-1 rounded">Featured</span>' : ''}
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Price</label>
+                        <input type="text" value="${pkg.price}" onchange="updatePackage(${index}, 'price', this.value)" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Description</label>
+                        <textarea onchange="updatePackage(${index}, 'desc', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${pkg.desc}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Features (Comma separated)</label>
+                        <textarea onchange="updatePackage(${index}, 'features', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${pkg.features.join(', ')}</textarea>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updatePackage(index, field, value) {
+            const packages = JSON.parse(localStorage.getItem('webora_packages') || JSON.stringify(defaultPackages));
+            if (field === 'features') {
+                packages[index][field] = value.split(',').map(f => f.trim());
+            } else {
+                packages[index][field] = value;
+            }
+            localStorage.setItem('webora_packages', JSON.stringify(packages));
+            showToast("Package Updated", "Remember to save your changes.");
+        }
+
+        // --- SERVICES MANAGER ---
+        function renderServicesAdmin() {
+            const container = document.getElementById('servicesAdminGrid');
+            const services = JSON.parse(localStorage.getItem('webora_services') || JSON.stringify(defaultServices));
+
+            container.innerHTML = services.map((srv, index) => `
+                <div class="glass-panel p-5 sm:p-6 rounded-2xl border-white/10 space-y-4">
+                    <div class="flex items-center gap-3 border-b border-white/10 pb-2">
+                        <i class="${srv.icon} text-xl ${srv.color}"></i>
+                        <h3 class="text-base sm:text-lg font-bold text-white">${srv.title}</h3>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Description</label>
+                        <textarea onchange="updateService(${index}, 'desc', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${srv.desc}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-400 mb-1">Features (Comma separated)</label>
+                        <textarea onchange="updateService(${index}, 'features', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${srv.features.join(', ')}</textarea>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateService(index, field, value) {
+            const services = JSON.parse(localStorage.getItem('webora_services') || JSON.stringify(defaultServices));
+            if (field === 'features') {
+                services[index][field] = value.split(',').map(f => f.trim());
+            } else {
+                services[index][field] = value;
+            }
+            localStorage.setItem('webora_services', JSON.stringify(services));
+            showToast("Service Updated", "Remember to save your changes.");
+        }
+
+        // --- PORTFOLIO MANAGER ---
+        function renderProjects() {
+            const container = document.getElementById('projectsList');
+            const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
+
+            if (projects.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-500 text-sm py-4">No custom projects added yet.</div>`;
+                return;
+            }
+
+            container.innerHTML = projects.map((proj, index) => `
+                <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between border-purple-500/20 relative group">
+                    <div>
+                        <div class="flex justify-between items-start mb-2 gap-2">
+                            <h3 class="text-base sm:text-lg font-bold text-white truncate">${proj.title}</h3>
+                            <span class="text-[10px] px-2 py-1 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20 uppercase whitespace-nowrap">${proj.tag}</span>
+                        </div>
+                        <p class="text-xs text-gray-400 mb-3 line-clamp-2">${proj.desc}</p>
+                        <div class="text-[10px] text-gray-500 font-mono mb-4 truncate">${proj.tech}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="previewCode(${index})" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition border border-white/10">Preview</button>
+                        <button onclick="deleteProject(${index})" class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs transition border border-red-500/20"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleAddProject(e) {
+            e.preventDefault();
+            const newProject = {
+                id: 'custom_' + Date.now(),
+                title: document.getElementById('projTitle').value,
+                tag: document.getElementById('projTag').value.toLowerCase().trim(),
+                desc: document.getElementById('projDesc').value,
+                tech: document.getElementById('projTech').value,
+                icon: document.getElementById('projIcon').value,
+                code: document.getElementById('projCode').value,
+            };
+
+            const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
+            projects.unshift(newProject);
+            localStorage.setItem('webora_custom_projects', JSON.stringify(projects));
+
+            document.getElementById('projectForm').reset();
+            renderProjects();
+            showToast("Project Published!", "It is now live on the main website.");
+        }
+
+        function deleteProject(index) {
+            if (confirm("Delete this project?")) {
+                const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
+                projects.splice(index, 1);
+                localStorage.setItem('webora_custom_projects', JSON.stringify(projects));
+                renderProjects();
+            }
+        }
+
+        function previewCode(index) {
+            const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
+            const proj = projects[index];
+            const previewWindow = window.open('', '_blank');
+            previewWindow.document.write(proj.code);
+            previewWindow.document.close();
+        }
+
+        // --- REVIEWS MANAGER ---
+        function renderReviewsAdmin() {
+            const container = document.getElementById('reviewsList');
+            const reviews = JSON.parse(localStorage.getItem('webora_reviews') || JSON.stringify(defaultReviews));
+
+            if (reviews.length === 0) {
+                container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-4">No reviews available.</div>`;
+                return;
+            }
+
+            container.innerHTML = reviews.map((rev, index) => `
+                <div class="glass-panel p-5 rounded-2xl border-white/10 relative group flex flex-col justify-between">
+                    <div>
+                        <div class="flex text-amber-400 gap-1 text-xs mb-2">
+                            <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                        </div>
+                        <p class="text-xs sm:text-sm text-gray-300 italic mb-4 line-clamp-3">"${rev.comment}"</p>
+                    </div>
+                    <div class="flex items-center justify-between border-t border-white/10 pt-3 mt-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full ${rev.color || 'bg-purplePrimary'} flex items-center justify-center font-bold text-white text-xs shrink-0">${rev.initial || rev.name.charAt(0)}</div>
+                            <div class="truncate">
+                                <div class="text-xs font-bold text-white truncate">${rev.name}</div>
+                                <div class="text-[10px] text-gray-400 truncate">${rev.company}</div>
+                            </div>
+                        </div>
+                        <button onclick="deleteReview(${index})" class="text-gray-500 hover:text-red-400 p-2 transition shrink-0"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function handleAddReview(e) {
+            e.preventDefault();
+            const name = document.getElementById('revName').value;
+            const newReview = {
+                name: name,
+                company: document.getElementById('revCompany').value,
+                comment: document.getElementById('revComment').value,
+                initial: name.charAt(0).toUpperCase(),
+                color: "bg-purplePrimary"
+            };
+
+            const reviews = JSON.parse(localStorage.getItem('webora_reviews') || JSON.stringify(defaultReviews));
+            reviews.unshift(newReview);
+            localStorage.setItem('webora_reviews', JSON.stringify(reviews));
+
+            e.target.reset();
+            renderReviewsAdmin();
+            showToast("Review Added", "It is now live on the website.");
+        }
+
+        function deleteReview(index) {
+            if (confirm("Delete this review?")) {
+                const reviews = JSON.parse(localStorage.getItem('webora_reviews') || JSON.stringify(defaultReviews));
+                reviews.splice(index, 1);
+                localStorage.setItem('webora_reviews', JSON.stringify(reviews));
+                renderReviewsAdmin();
+            }
+        }
+
+        // --- TOAST & RESET ---
+        function showToast(title, message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastTitle').textContent = title;
+            document.getElementById('toastMessage').textContent = message;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function resetAllData() {
+            if (confirm("Are you sure you want to reset all data to default? This will erase all custom inquiries, projects, and reviews.")) {
+                localStorage.clear();
+                window.location.reload();
+            }
+        }
+
+        // --- INIT ---
+        initializeData();
+        switchTab('inquiries'); // Default tab
+    </script>
+</body>
+
+</html>
