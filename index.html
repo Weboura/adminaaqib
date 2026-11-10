@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WEBORA | Admin Portal</title>
 
-    <!-- Google Fonts & Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -14,25 +13,14 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: {
-                        darkBg: '#09090b',
-                        darkCard: '#12121a',
-                        purpleGlow: '#a855f7',
-                        purplePrimary: '#7c3aed',
-                        indigoGlow: '#6366f1',
-                    },
-                    fontFamily: {
-                        sans: ['Plus Jakarta Sans', 'sans-serif'],
-                        brand: ['Montserrat', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    }
+                    colors: { darkBg: '#09090b', darkCard: '#12121a', purpleGlow: '#a855f7', purplePrimary: '#7c3aed', indigoGlow: '#6366f1' },
+                    fontFamily: { sans: ['Plus Jakarta Sans', 'sans-serif'], brand: ['Montserrat', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] }
                 }
             }
         }
@@ -65,7 +53,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -82,217 +69,284 @@
         ::-webkit-scrollbar-thumb:hover {
             background: #7c3aed;
         }
+
+        .sync-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 999px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .sync-online {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .sync-offline {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .sync-saving {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
     </style>
 </head>
 
 <body class="antialiased selection:bg-purplePrimary selection:text-white relative min-h-screen pb-20">
 
-    <!-- Navigation Header -->
-    <header class="fixed top-0 left-0 w-full z-50 glass-nav">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <div class="flex items-center gap-2 sm:gap-4">
-                <span class="font-brand text-2xl sm:text-3xl font-extrabold tracking-wider text-gradient">WEBORA</span>
-                <span
-                    class="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-purplePrimary/20 border border-purplePrimary/30 text-[10px] sm:text-xs font-bold text-purpleGlow uppercase tracking-widest hidden sm:block">Admin
-                    CMS</span>
+    <!-- LOGIN SCREEN -->
+    <div id="loginScreen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-darkBg">
+        <div class="glass-panel p-8 sm:p-10 rounded-3xl max-w-md w-full border-purple-500/40">
+            <div class="text-center mb-8">
+                <span class="font-brand text-3xl font-extrabold tracking-wider text-gradient">WEBORA</span>
+                <div class="text-xs text-purpleGlow font-bold uppercase tracking-widest mt-2">Admin Portal Login</div>
             </div>
-            <div class="flex items-center gap-2 sm:gap-4">
-                <a href="index.html" target="_blank"
-                    class="text-sm font-semibold text-gray-300 hover:text-white transition flex items-center gap-2">
-                    <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">View
-                        Site</span>
-                </a>
-                <button onclick="resetAllData()"
-                    class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs sm:text-sm font-bold transition"
-                    title="Reset to Default">
-                    Reset
+            <form onsubmit="handleLogin(event)" class="space-y-5">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-300 mb-1">Password</label>
+                    <div class="relative">
+                        <input type="password" id="loginPassword" required autofocus placeholder="Enter admin password"
+                            class="w-full px-4 py-3 pr-12 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                        <button type="button" onclick="togglePasswordVisibility()"
+                            class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-purpleGlow">
+                            <i id="eyeIcon" class="fa-solid fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="loginError"
+                    class="hidden text-xs text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">
+                    <i class="fa-solid fa-triangle-exclamation mr-1"></i> Incorrect password. Try again.
+                </div>
+                <button type="submit"
+                    class="w-full py-3.5 rounded-xl bg-gradient-to-r from-purplePrimary to-indigoGlow text-white font-bold text-sm shadow-lg shadow-purplePrimary/30 hover:opacity-95 transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-lock-open"></i> Unlock Admin Panel
                 </button>
-            </div>
+                <p class="text-[10px] text-gray-500 text-center">Protected area. Unauthorized access prohibited.</p>
+            </form>
         </div>
-    </header>
+    </div>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 space-y-6 sm:space-y-8">
-
-        <!-- Tab Navigation -->
-        <div class="flex overflow-x-auto border-b border-white/10 gap-4 sm:gap-6 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
-            <button onclick="switchTab('inquiries')" id="tab-inquiries"
-                class="whitespace-nowrap pb-2 text-sm font-bold text-purpleGlow border-b-2 border-purpleGlow transition">Inquiries</button>
-            <button onclick="switchTab('settings')" id="tab-settings"
-                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Settings</button>
-            <button onclick="switchTab('packages')" id="tab-packages"
-                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Packages</button>
-            <button onclick="switchTab('services')" id="tab-services"
-                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Services</button>
-            <button onclick="switchTab('portfolio')" id="tab-portfolio"
-                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Portfolio</button>
-            <button onclick="switchTab('reviews')" id="tab-reviews"
-                class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Reviews</button>
-        </div>
-
-        <!-- TAB: INQUIRIES -->
-        <div id="content-inquiries" class="space-y-6">
-            <div class="flex justify-between items-center">
-                <h2 class="text-xl sm:text-2xl font-bold text-white">Recent Inquiries</h2>
-                <button onclick="clearInquiries()" class="text-xs text-red-400 hover:text-red-300 font-semibold"><i
-                        class="fa-solid fa-trash-can mr-1"></i> Clear All</button>
-            </div>
-            <div id="inquiriesList" class="grid grid-cols-1 gap-4"></div>
-        </div>
-
-        <!-- TAB: SITE SETTINGS -->
-        <div id="content-settings" class="space-y-8 hidden">
-            <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
-                <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-purpleGlow"></i> Global Site Settings
-                </h2>
-                <form id="settingsForm" onsubmit="saveSettings(event)" class="space-y-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Hero Main Title</label>
-                            <input type="text" id="setHeroTitle"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Hero Subtitle</label>
-                            <input type="text" id="setHeroSub"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Contact Email</label>
-                            <input type="email" id="setEmail"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Contact Phone /
-                                WhatsApp</label>
-                            <input type="text" id="setPhone"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp Link (e.g.,
-                                https://wa.me/94789491209)</label>
-                            <input type="text" id="setWhatsApp"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">TikTok Profile Link (e.g.,
-                                https://tiktok.com/@webora)</label>
-                            <input type="text" id="setTikTok"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                    </div>
-                    <button type="submit"
-                        class="w-full md:w-auto px-8 py-3 rounded-xl bg-purplePrimary text-white font-bold text-sm hover:bg-purpleGlow transition">
-                        Save Settings
+    <!-- ADMIN PANEL -->
+    <div id="adminPanel" class="hidden">
+        <header class="fixed top-0 left-0 w-full z-50 glass-nav">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <span
+                        class="font-brand text-2xl sm:text-3xl font-extrabold tracking-wider text-gradient">WEBORA</span>
+                    <span
+                        class="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-purplePrimary/20 border border-purplePrimary/30 text-[10px] sm:text-xs font-bold text-purpleGlow uppercase tracking-widest hidden sm:block">Admin
+                        CMS</span>
+                    <span id="syncStatus" class="sync-indicator sync-saving"><i
+                            class="fa-solid fa-circle-notch fa-spin"></i> Connecting</span>
+                </div>
+                <div class="flex items-center gap-2 sm:gap-4">
+                    <a href="index.html" target="_blank"
+                        class="text-sm font-semibold text-gray-300 hover:text-white transition flex items-center gap-2">
+                        <i class="fa-solid fa-arrow-up-right-from-square"></i> <span class="hidden sm:inline">View
+                            Site</span>
+                    </a>
+                    <button onclick="handleLogout()"
+                        class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-gray-500/10 border border-gray-500/30 text-gray-300 hover:bg-gray-500/20 text-xs sm:text-sm font-bold transition">
+                        <i class="fa-solid fa-right-from-bracket"></i> <span class="hidden sm:inline">Logout</span>
                     </button>
-                </form>
+                    <button onclick="resetAllData()"
+                        class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 hover:bg-red-500/20 text-xs sm:text-sm font-bold transition">Reset</button>
+                </div>
             </div>
-        </div>
+        </header>
 
-        <!-- TAB: PACKAGES -->
-        <div id="content-packages" class="space-y-8 hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="packagesAdminGrid"></div>
-        </div>
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 sm:pt-28 space-y-6 sm:space-y-8">
+            <div class="flex overflow-x-auto border-b border-white/10 gap-4 sm:gap-6 pb-2 -mx-4 px-4 sm:mx-0 sm:px-0">
+                <button onclick="switchTab('inquiries')" id="tab-inquiries"
+                    class="whitespace-nowrap pb-2 text-sm font-bold text-purpleGlow border-b-2 border-purpleGlow transition">Inquiries</button>
+                <button onclick="switchTab('settings')" id="tab-settings"
+                    class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Settings</button>
+                <button onclick="switchTab('packages')" id="tab-packages"
+                    class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Packages</button>
+                <button onclick="switchTab('services')" id="tab-services"
+                    class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Services</button>
+                <button onclick="switchTab('portfolio')" id="tab-portfolio"
+                    class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Portfolio</button>
+                <button onclick="switchTab('reviews')" id="tab-reviews"
+                    class="whitespace-nowrap pb-2 text-sm font-bold text-gray-400 hover:text-white border-b-2 border-transparent transition">Reviews</button>
+            </div>
 
-        <!-- TAB: SERVICES -->
-        <div id="content-services" class="space-y-8 hidden">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="servicesAdminGrid"></div>
-        </div>
+            <div id="content-inquiries" class="space-y-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-xl sm:text-2xl font-bold text-white">Recent Inquiries</h2>
+                    <button onclick="clearInquiries()" class="text-xs text-red-400 hover:text-red-300 font-semibold"><i
+                            class="fa-solid fa-trash-can mr-1"></i> Clear All</button>
+                </div>
+                <div id="inquiriesList" class="grid grid-cols-1 gap-4"></div>
+            </div>
 
-        <!-- TAB: PORTFOLIO -->
-        <div id="content-portfolio" class="space-y-8 hidden">
-            <!-- Add Project Form -->
-            <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
-                <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-plus-circle text-purpleGlow"></i> Add New Project
-                </h2>
-                <form id="projectForm" onsubmit="handleAddProject(event)" class="space-y-5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Project Title *</label>
-                            <input type="text" id="projTitle" required placeholder="e.g. My Awesome App"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+            <div id="content-settings" class="space-y-8 hidden">
+                <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
+                    <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-purpleGlow"></i> Global Site Settings
+                    </h2>
+                    <form id="settingsForm" onsubmit="saveSettings(event)" class="space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Hero Main Title</label>
+                                <input type="text" id="setHeroTitle"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Hero Subtitle</label>
+                                <input type="text" id="setHeroSub"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Contact Email</label>
+                                <input type="email" id="setEmail"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Contact Phone /
+                                    WhatsApp</label>
+                                <input type="text" id="setPhone"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">WhatsApp Link</label>
+                                <input type="text" id="setWhatsApp"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">TikTok Profile
+                                    Link</label>
+                                <input type="text" id="setTikTok"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <!-- NEW: INSTAGRAM FIELD -->
+                            <div class="md:col-span-2">
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">
+                                    <i class="fa-brands fa-instagram mr-1 text-pink-400"></i> Instagram Profile Link
+                                </label>
+                                <input type="text" id="setInstagram" placeholder="https://www.instagram.com/yourhandle"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                                <p class="text-[10px] text-gray-500 mt-1">Paste the full Instagram URL. This will power
+                                    the Instagram icon on the main site footer.</p>
+                            </div>
+                        </div>
+                        <button type="submit"
+                            class="w-full md:w-auto px-8 py-3 rounded-xl bg-purplePrimary text-white font-bold text-sm hover:bg-purpleGlow transition">Save
+                            Settings</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="content-packages" class="space-y-8 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="packagesAdminGrid"></div>
+            </div>
+
+            <div id="content-services" class="space-y-8 hidden">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="servicesAdminGrid"></div>
+            </div>
+
+            <div id="content-portfolio" class="space-y-8 hidden">
+                <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
+                    <h2 id="projectFormTitle"
+                        class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-plus-circle text-purpleGlow"></i> Add New Project
+                    </h2>
+                    <form id="projectForm" onsubmit="handleProjectSubmit(event)" class="space-y-5">
+                        <input type="hidden" id="projEditId" value="">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Project Title *</label>
+                                <input type="text" id="projTitle" required placeholder="e.g. My Awesome App"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Category Tag *</label>
+                                <input type="text" id="projTag" required placeholder="e.g. saas"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Category Tag *</label>
-                            <input type="text" id="projTag" required placeholder="e.g. saas"
+                            <label class="block text-xs font-semibold text-gray-300 mb-1">Short Description *</label>
+                            <textarea id="projDesc" required rows="2" placeholder="Brief description..."
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition"></textarea>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Tech Stack (Comma
+                                    separated) *</label>
+                                <input type="text" id="projTech" required placeholder="React, Node.js"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-gray-300 mb-1">Cover Icon (FontAwesome
+                                    class) *</label>
+                                <input type="text" id="projIcon" required placeholder="fa-solid fa-rocket"
+                                    class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            </div>
+                        </div>
+                        <div class="border-t border-white/10 pt-5 mt-5">
+                            <label class="block text-xs font-semibold text-purpleGlow mb-2 flex items-center gap-2">
+                                <i class="fa-solid fa-code"></i> Paste Demo Code (HTML/CSS/JS) *
+                            </label>
+                            <textarea id="projCode" required rows="10" placeholder="<html>...</html>"
+                                class="w-full px-4 py-3 rounded-xl bg-[#09090b] border border-white/10 text-emerald-400 font-mono text-sm focus:outline-none focus:border-purpleGlow transition leading-relaxed"></textarea>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <button type="submit" id="projectSubmitBtn"
+                                class="flex-1 py-4 rounded-xl bg-gradient-to-r from-purplePrimary to-indigoGlow text-white font-bold text-sm shadow-lg shadow-purplePrimary/30 hover:opacity-95 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> <span id="projectSubmitLabel">Publish
+                                    Project</span>
+                            </button>
+                            <button type="button" id="projectCancelBtn" onclick="cancelProjectEdit()"
+                                class="hidden py-4 px-6 rounded-xl bg-gray-500/10 border border-gray-500/30 text-gray-300 hover:bg-gray-500/20 text-sm font-bold transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-xmark"></i> Cancel
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-white mb-4">Published Projects</h2>
+                    <div id="projectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
+            </div>
+
+            <div id="content-reviews" class="space-y-8 hidden">
+                <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
+                    <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-star text-amber-400"></i> Manage Client Reviews
+                    </h2>
+                    <form onsubmit="handleAddReview(event)"
+                        class="space-y-4 mb-8 p-4 sm:p-6 bg-black/30 rounded-2xl border border-white/5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <input type="text" id="revName" required placeholder="Client Name"
+                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
+                            <input type="text" id="revCompany" required placeholder="Company / Role"
                                 class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
                         </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold text-gray-300 mb-1">Short Description *</label>
-                        <textarea id="projDesc" required rows="2" placeholder="Brief description..."
+                        <textarea id="revComment" required rows="2" placeholder="Review message..."
                             class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition"></textarea>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Tech Stack (Comma separated)
-                                *</label>
-                            <input type="text" id="projTech" required placeholder="React, Node.js"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold text-gray-300 mb-1">Cover Icon (FontAwesome class)
-                                *</label>
-                            <input type="text" id="projIcon" required placeholder="fa-solid fa-rocket"
-                                class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        </div>
-                    </div>
-                    <div class="border-t border-white/10 pt-5 mt-5">
-                        <label class="block text-xs font-semibold text-purpleGlow mb-2 flex items-center gap-2">
-                            <i class="fa-solid fa-code"></i> Paste Demo Code (HTML/CSS/JS) *
-                        </label>
-                        <textarea id="projCode" required rows="10"
-                            placeholder="<html>\n<body>\n  <h1>Hello World</h1>\n</body>\n</html>"
-                            class="w-full px-4 py-3 rounded-xl bg-[#09090b] border border-white/10 text-emerald-400 font-mono text-sm focus:outline-none focus:border-purpleGlow transition leading-relaxed"></textarea>
-                    </div>
-                    <button type="submit"
-                        class="w-full py-4 rounded-xl bg-gradient-to-r from-purplePrimary to-indigoGlow text-white font-bold text-sm shadow-lg shadow-purplePrimary/30 hover:opacity-95 transition flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Publish Project
-                    </button>
-                </form>
+                        <button type="submit"
+                            class="px-6 py-2 rounded-xl bg-purplePrimary text-white font-bold text-sm hover:bg-purpleGlow transition w-full sm:w-auto">Add
+                            Review</button>
+                    </form>
+                    <div id="reviewsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+                </div>
             </div>
+        </main>
+    </div>
 
-            <!-- Existing Projects List -->
-            <div>
-                <h2 class="text-xl font-bold text-white mb-4">Published Projects</h2>
-                <div id="projectsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-        </div>
-
-        <!-- TAB: REVIEWS -->
-        <div id="content-reviews" class="space-y-8 hidden">
-            <div class="glass-panel p-6 sm:p-8 rounded-3xl border-purple-500/30">
-                <h2 class="text-xl sm:text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                    <i class="fa-solid fa-star text-amber-400"></i> Manage Client Reviews
-                </h2>
-                <!-- Add Review Form -->
-                <form onsubmit="handleAddReview(event)"
-                    class="space-y-4 mb-8 p-4 sm:p-6 bg-black/30 rounded-2xl border border-white/5">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <input type="text" id="revName" required placeholder="Client Name"
-                            class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                        <input type="text" id="revCompany" required placeholder="Company / Role"
-                            class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition">
-                    </div>
-                    <textarea id="revComment" required rows="2" placeholder="Review message..."
-                        class="w-full px-4 py-3 rounded-xl bg-darkBg border border-white/10 text-white text-sm focus:outline-none focus:border-purpleGlow transition"></textarea>
-                    <button type="submit"
-                        class="px-6 py-2 rounded-xl bg-purplePrimary text-white font-bold text-sm hover:bg-purpleGlow transition w-full sm:w-auto">
-                        Add Review
-                    </button>
-                </form>
-
-                <div id="reviewsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-            </div>
-        </div>
-
-    </main>
-
-    <!-- TOAST NOTIFICATION -->
     <div id="toast"
-        class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel border-emerald-500/50 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl max-w-[90vw]">
+        class="fixed bottom-6 right-6 z-[60] transform translate-y-20 opacity-0 transition-all duration-300 glass-panel border-emerald-500/50 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-2xl max-w-[90vw]">
         <i class="fa-solid fa-circle-check text-emerald-400 text-xl"></i>
         <div>
             <div id="toastTitle" class="font-bold text-white text-sm">Success</div>
@@ -300,25 +354,56 @@
         </div>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- FIREBASE SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-analytics.js";
+        import { getDatabase, ref, onValue, set, remove } from "https://www.gstatic.com/firebasejs/13.2.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzEHb8oTCmU4HmRbFds9DB6-fe-pCwzMY",
+            authDomain: "webora-5f4c4.firebaseapp.com",
+            databaseURL: "https://webora-5f4c4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "webora-5f4c4",
+            storageBucket: "webora-5f4c4.firebasestorage.app",
+            messagingSenderId: "251844367394",
+            appId: "1:251844367394:web:c5fc912dca7e27f987a67b",
+            measurementId: "G-0BBGYMGF79"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        getAnalytics(app);
+        const db = getDatabase(app);
+
+        window.firebaseDB = db;
+        window.firebaseRef = ref;
+        window.firebaseOnValue = onValue;
+        window.firebaseSet = set;
+        window.firebaseRemove = remove;
+
+        console.log("🔥 Firebase Admin connected:", firebaseConfig.projectId);
+        window.dispatchEvent(new Event('firebase-ready'));
+    </script>
+
+    <!-- ADMIN LOGIC -->
     <script>
-        // --- DEFAULT DATA SETUP ---
+        const ADMIN_PASSWORD = "aaqin2009";
+        const SESSION_KEY = "webora_admin_session";
+
         const defaultSettings = {
             heroTitle: "Crafting Next-Gen Digital Experiences",
             heroSub: "Webora is a premier web development agency delivering high-speed web apps, custom corporate sites, and modern e-commerce solutions built to scale your brand.",
-            email: "weboradev@gmail.com",
-            phone: "0789491209",
+            email: "weboradev@gmail.com", phone: "0789491209",
             whatsapp: "https://wa.me/94789491209",
-            tiktok: "https://tiktok.com/@webora"
+            tiktok: "https://tiktok.com/@webora",
+            instagram: "https://www.instagram.com/the.oud.and.co?srtk=MTRjbnE2eGd2ZGsyYg=="
         };
-
         const defaultPackages = [
             { id: "p1", tier: "Starter Package", subtitle: "Personal & Landing Pages", desc: "Perfect for personal portfolios, landing pages, and small projects.", price: "LKR 9,500", tax: "* No hidden fees", domain: "yourname.github.io", features: ["Free GitHub Pages web hosting setup", "Mobile-Responsive Design", "Basic On-Page SEO"], featured: false },
             { id: "p2", tier: "Small Business", subtitle: "E-Commerce Store", desc: "Perfect for small stores selling products/services online.", price: "LKR 14,500", tax: "* Custom domain included", domain: "yourstore.com", features: ["Product listing & management", "WhatsApp / Online order system", "SEO setup included"], featured: true },
             { id: "p3", tier: "Premium Package", subtitle: "Custom Web App", desc: "Full custom AI-enhanced PHP web app with custom database features.", price: "LKR 30,000", tax: "* Full configuration included", domain: "yourcompany.com", features: ["AI-Enhanced PHP Web App", "Custom Database Architecture", "Custom domain & hosting integration"], featured: false },
-            { id: "p4", tier: "Custom Build", subtitle: "Command the Developer", desc: "Tell me exactly what you need. I'll build it from scratch, feature by feature, just the way you command.", price: "Let's Talk", tax: "* Priced based on your commands", domain: "You set the rules", features: ["Completely custom features", "Bespoke integrations", "Built to your exact specs"], featured: false }
+            { id: "p4", tier: "Custom Build", subtitle: "Command the Developer", desc: "Tell me exactly what you need. I'll build it from scratch, feature by feature.", price: "Let's Talk", tax: "* Priced based on your commands", domain: "You set the rules", features: ["Completely custom features", "Bespoke integrations", "Built to your exact specs"], featured: false }
         ];
-
         const defaultServices = [
             { id: "s1", title: "Custom Websites", desc: "Beautiful, tailor-made websites built from scratch to perfectly match your brand and goals.", features: ["Unique designs (no templates)", "Works perfectly on phones & tablets", "Easy to update yourself"], icon: "fa-solid fa-laptop-code", color: "text-purpleGlow" },
             { id: "s2", title: "Online Stores", desc: "Simple and secure e-commerce setups so you can start selling your products online quickly.", features: ["Easy product management", "Secure local & international payments", "Simple checkout process"], icon: "fa-solid fa-store", color: "text-indigo-400" },
@@ -327,99 +412,200 @@
             { id: "s5", title: "UI/UX Design", desc: "Clean, modern layouts designed to make your business look professional and trustworthy.", features: ["Beautiful, modern visual design", "Easy-to-use navigation", "Layouts built to get more leads"], icon: "fa-solid fa-pen-nib", color: "text-indigo-400" },
             { id: "s6", title: "Maintenance & Support", desc: "We keep your website secure, updated, and running smoothly so you don't have to worry.", features: ["Regular software updates", "Daily backups & security checks", "Quick fixes if anything breaks"], icon: "fa-solid fa-shield-halved", color: "text-emerald-400" }
         ];
-
         const defaultReviews = [
-            { name: "Dinesh Perera", company: "Founder, LuxeCeylon", comment: "WEBORA transformed our e-commerce site. Our page load speed dropped under 1 second, and online sales increased significantly within weeks!", initial: "DS", color: "bg-purplePrimary" },
-            { name: "Sarah Jayawardena", company: "CMO, Apex Holdings", comment: "The design aesthetic and dark purple glowing theme they executed for our portal were stunning. Fast response times on WhatsApp throughout.", initial: "SJ", color: "bg-indigo-600" },
-            { name: "Roshan Nizar", company: "CTO, PulseAnalytics", comment: "Delivered our web application ahead of schedule with spotless code architecture. Highly recommended team for complex projects.", initial: "RN", color: "bg-emerald-600" }
+            { name: "Dinesh Perera", company: "Founder, LuxeCeylon", comment: "WEBORA transformed our e-commerce site. Our page load speed dropped under 1 second!", initial: "DS", color: "bg-purplePrimary" },
+            { name: "Sarah Jayawardena", company: "CMO, Apex Holdings", comment: "The design aesthetic and dark purple glowing theme they executed were stunning.", initial: "SJ", color: "bg-indigo-600" },
+            { name: "Roshan Nizar", company: "CTO, PulseAnalytics", comment: "Delivered our web application ahead of schedule with spotless code architecture.", initial: "RN", color: "bg-emerald-600" }
         ];
 
-        // --- INITIALIZATION ---
-        function initializeData() {
-            if (!localStorage.getItem('webora_inquiries')) localStorage.setItem('webora_inquiries', JSON.stringify([]));
-            if (!localStorage.getItem('webora_custom_projects')) localStorage.setItem('webora_custom_projects', JSON.stringify([]));
-            if (!localStorage.getItem('webora_settings')) localStorage.setItem('webora_settings', JSON.stringify(defaultSettings));
-            if (!localStorage.getItem('webora_packages')) localStorage.setItem('webora_packages', JSON.stringify(defaultPackages));
-            if (!localStorage.getItem('webora_services')) localStorage.setItem('webora_services', JSON.stringify(defaultServices));
-            if (!localStorage.getItem('webora_reviews')) localStorage.setItem('webora_reviews', JSON.stringify(defaultReviews));
+        // ---------- AUTH ----------
+        function handleLogin(e) {
+            e.preventDefault();
+            const pwd = document.getElementById('loginPassword').value;
+            if (pwd === ADMIN_PASSWORD) {
+                sessionStorage.setItem(SESSION_KEY, "true");
+                showAdminPanel();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+                document.getElementById('loginPassword').value = '';
+                document.getElementById('loginPassword').focus();
+            }
+        }
+        function togglePasswordVisibility() {
+            const input = document.getElementById('loginPassword');
+            const icon = document.getElementById('eyeIcon');
+            if (input.type === 'password') { input.type = 'text'; icon.classList.remove('fa-eye'); icon.classList.add('fa-eye-slash'); }
+            else { input.type = 'password'; icon.classList.remove('fa-eye-slash'); icon.classList.add('fa-eye'); }
+        }
+        function handleLogout() {
+            if (confirm("Log out of admin panel?")) {
+                sessionStorage.removeItem(SESSION_KEY);
+                window.location.reload();
+            }
+        }
+        function showAdminPanel() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').classList.remove('hidden');
+            initAdmin();
+        }
+        if (sessionStorage.getItem(SESSION_KEY) === "true") showAdminPanel();
+
+        // ---------- FIREBASE STATE ----------
+        let firebaseReady = false;
+        let localData = { settings: null, packages: null, services: null, projects: null, reviews: null, inquiries: null };
+
+        function setSyncStatus(status) {
+            const el = document.getElementById('syncStatus');
+            if (!el) return;
+            if (status === 'online') { el.className = 'sync-indicator sync-online'; el.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Synced'; }
+            else if (status === 'saving') { el.className = 'sync-indicator sync-saving'; el.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Saving'; }
+            else { el.className = 'sync-indicator sync-offline'; el.innerHTML = '<i class="fa-solid fa-wifi"></i> Offline'; }
         }
 
-        // --- TAB SWITCHING ---
+        function dbPath(key) { return 'webora/' + key; }
+
+        async function saveToFirebase(key, data) {
+            localData[key] = data;
+            if (!firebaseReady) { setSyncStatus('offline'); return; }
+            try {
+                setSyncStatus('saving');
+                await window.firebaseSet(window.firebaseRef(window.firebaseDB, dbPath(key)), data);
+                setSyncStatus('online');
+            } catch (err) {
+                console.error("Firebase save failed:", err);
+                setSyncStatus('offline');
+                showToast("Offline", "Saved locally. Will sync when online.");
+            }
+        }
+
+        function getDefaultFor(key) {
+            if (key === 'settings') return defaultSettings;
+            if (key === 'packages') return defaultPackages;
+            if (key === 'services') return defaultServices;
+            if (key === 'projects') return [];
+            if (key === 'reviews') return defaultReviews;
+            if (key === 'inquiries') return [];
+            return null;
+        }
+
+        function subscribeToFirebase() {
+            const keys = ['settings', 'packages', 'services', 'projects', 'reviews', 'inquiries'];
+            let pending = keys.length;
+
+            keys.forEach(key => {
+                const dbRef = window.firebaseRef(window.firebaseDB, dbPath(key));
+                window.firebaseOnValue(dbRef, (snapshot) => {
+                    const val = snapshot.val();
+                    if (val === null || val === undefined) {
+                        const seed = getDefaultFor(key);
+                        if (seed !== null) {
+                            window.firebaseSet(window.firebaseRef(window.firebaseDB, dbPath(key)), seed);
+                        }
+                    } else {
+                        localData[key] = val;
+                        rerenderActiveTab();
+                    }
+                    pending--;
+                    if (pending === 0) setSyncStatus('online');
+                }, (err) => {
+                    console.error("Firebase listener error for", key, err);
+                    setSyncStatus('offline');
+                });
+            });
+        }
+
+        function initAdmin() {
+            switchTab('inquiries');
+            if (window.firebaseDB) {
+                firebaseReady = true;
+                subscribeToFirebase();
+            } else {
+                window.addEventListener('firebase-ready', () => {
+                    firebaseReady = true;
+                    subscribeToFirebase();
+                });
+            }
+            setTimeout(() => { if (!firebaseReady) setSyncStatus('offline'); }, 5000);
+        }
+
+        // ---------- TABS ----------
+        let activeTab = 'inquiries';
         function switchTab(tab) {
-            const tabs = ['inquiries', 'settings', 'packages', 'services', 'portfolio', 'reviews'];
-            tabs.forEach(t => {
+            activeTab = tab;
+            ['inquiries', 'settings', 'packages', 'services', 'portfolio', 'reviews'].forEach(t => {
                 document.getElementById(`content-${t}`).classList.add('hidden');
                 document.getElementById(`tab-${t}`).classList.remove('text-purpleGlow', 'border-purpleGlow');
                 document.getElementById(`tab-${t}`).classList.add('text-gray-400', 'border-transparent');
             });
-
             document.getElementById(`content-${tab}`).classList.remove('hidden');
             document.getElementById(`tab-${tab}`).classList.add('text-purpleGlow', 'border-purpleGlow');
             document.getElementById(`tab-${tab}`).classList.remove('text-gray-400', 'border-transparent');
 
             if (tab === 'settings') loadSettings();
-            if (tab === 'packages') renderPackagesAdmin();
-            if (tab === 'services') renderServicesAdmin();
-            if (tab === 'inquiries') renderInquiries();
-            if (tab === 'portfolio') renderProjects();
-            if (tab === 'reviews') renderReviewsAdmin();
+            else if (tab === 'packages') renderPackagesAdmin();
+            else if (tab === 'services') renderServicesAdmin();
+            else if (tab === 'inquiries') renderInquiries();
+            else if (tab === 'portfolio') renderProjects();
+            else if (tab === 'reviews') renderReviewsAdmin();
         }
+        function rerenderActiveTab() { if (activeTab) switchTab(activeTab); }
 
-        // --- RENDER INQUIRIES ---
+        // ---------- INQUIRIES ----------
         function renderInquiries() {
             const container = document.getElementById('inquiriesList');
-            const inquiries = JSON.parse(localStorage.getItem('webora_inquiries') || '[]');
-
-            if (inquiries.length === 0) {
+            const inquiries = localData.inquiries || [];
+            const list = Array.isArray(inquiries) ? inquiries : Object.values(inquiries);
+            if (!list.length) {
                 container.innerHTML = `<div class="glass-panel p-8 rounded-2xl text-center text-gray-400"><i class="fa-solid fa-inbox text-4xl mb-4 text-gray-600"></i><p>No inquiries yet.</p></div>`;
                 return;
             }
-
-            container.innerHTML = inquiries.map((inq, index) => `
+            const sorted = [...list].reverse();
+            container.innerHTML = sorted.map((inq, displayIdx) => {
+                const realIdx = list.length - 1 - displayIdx;
+                return `
                 <div class="glass-panel p-5 sm:p-6 rounded-2xl border-l-4 border-purplePrimary relative group">
                     <div class="flex justify-between items-start mb-4 gap-2">
                         <div>
-                            <div class="text-base sm:text-lg font-bold text-white">${inq.name}</div>
-                            <div class="text-xs text-purpleGlow font-mono mt-1"><i class="fa-solid fa-tag mr-1"></i> ${inq.service}</div>
+                            <div class="text-base sm:text-lg font-bold text-white">${inq.name || 'Unknown'}</div>
+                            <div class="text-xs text-purpleGlow font-mono mt-1"><i class="fa-solid fa-tag mr-1"></i> ${inq.service || 'General'}</div>
                         </div>
-                        <span class="text-[10px] sm:text-xs text-gray-500 bg-white/5 px-2 py-1 rounded whitespace-nowrap">${inq.date}</span>
+                        <span class="text-[10px] sm:text-xs text-gray-500 bg-white/5 px-2 py-1 rounded whitespace-nowrap">${inq.date || ''}</span>
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs sm:text-sm text-gray-300 mb-4">
-                        <div class="truncate"><i class="fa-solid fa-envelope text-gray-500 mr-2"></i> ${inq.email}</div>
+                        <div class="truncate"><i class="fa-solid fa-envelope text-gray-500 mr-2"></i> ${inq.email || 'N/A'}</div>
                         <div><i class="fa-solid fa-phone text-gray-500 mr-2"></i> ${inq.phone || 'N/A'}</div>
                     </div>
-                    <div class="bg-black/30 p-3 rounded-xl text-xs sm:text-sm text-gray-300 italic border border-white/5">"${inq.message}"</div>
-                    <button onclick="deleteInquiry(${index})" class="absolute top-4 right-4 text-gray-500 hover:text-red-400 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity p-2"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `).join('');
+                    <div class="bg-black/30 p-3 rounded-xl text-xs sm:text-sm text-gray-300 italic border border-white/5">"${inq.message || ''}"</div>
+                    <button onclick="deleteInquiry(${realIdx})" class="absolute top-4 right-4 text-gray-500 hover:text-red-400 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity p-2"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            }).join('');
         }
-
-        function deleteInquiry(index) {
-            const inquiries = JSON.parse(localStorage.getItem('webora_inquiries') || '[]');
-            inquiries.splice(index, 1);
-            localStorage.setItem('webora_inquiries', JSON.stringify(inquiries));
+        async function deleteInquiry(index) {
+            const list = Array.isArray(localData.inquiries) ? [...localData.inquiries] : Object.values(localData.inquiries || {});
+            list.splice(index, 1);
+            await saveToFirebase('inquiries', list);
             renderInquiries();
         }
-
-        function clearInquiries() {
+        async function clearInquiries() {
             if (confirm("Clear all inquiries?")) {
-                localStorage.setItem('webora_inquiries', JSON.stringify([]));
+                await saveToFirebase('inquiries', []);
                 renderInquiries();
+                showToast("Cleared", "All inquiries removed.");
             }
         }
 
-        // --- SETTINGS MANAGER ---
+        // ---------- SETTINGS ----------
         function loadSettings() {
-            const settings = JSON.parse(localStorage.getItem('webora_settings') || JSON.stringify(defaultSettings));
-            document.getElementById('setHeroTitle').value = settings.heroTitle;
-            document.getElementById('setHeroSub').value = settings.heroSub;
-            document.getElementById('setEmail').value = settings.email;
-            document.getElementById('setPhone').value = settings.phone;
-            document.getElementById('setWhatsApp').value = settings.whatsapp;
-            document.getElementById('setTikTok').value = settings.tiktok || "";
+            const s = localData.settings || defaultSettings;
+            document.getElementById('setHeroTitle').value = s.heroTitle || '';
+            document.getElementById('setHeroSub').value = s.heroSub || '';
+            document.getElementById('setEmail').value = s.email || '';
+            document.getElementById('setPhone').value = s.phone || '';
+            document.getElementById('setWhatsApp').value = s.whatsapp || '';
+            document.getElementById('setTikTok').value = s.tiktok || '';
+            document.getElementById('setInstagram').value = s.instagram || '';
         }
-
-        function saveSettings(e) {
+        async function saveSettings(e) {
             e.preventDefault();
             const newSettings = {
                 heroTitle: document.getElementById('setHeroTitle').value,
@@ -428,17 +614,18 @@
                 phone: document.getElementById('setPhone').value,
                 whatsapp: document.getElementById('setWhatsApp').value,
                 tiktok: document.getElementById('setTikTok').value,
+                instagram: document.getElementById('setInstagram').value
             };
-            localStorage.setItem('webora_settings', JSON.stringify(newSettings));
-            showToast("Settings Saved!", "Your site configurations have been updated.");
+            await saveToFirebase('settings', newSettings);
+            showToast("Settings Saved!", "Live updates pushed to Firebase.");
         }
 
-        // --- PACKAGES MANAGER ---
+        // ---------- PACKAGES ----------
         function renderPackagesAdmin() {
             const container = document.getElementById('packagesAdminGrid');
-            const packages = JSON.parse(localStorage.getItem('webora_packages') || JSON.stringify(defaultPackages));
-
-            container.innerHTML = packages.map((pkg, index) => `
+            const packages = localData.packages || defaultPackages;
+            const list = Array.isArray(packages) ? packages : Object.values(packages);
+            container.innerHTML = list.map((pkg, index) => `
                 <div class="glass-panel p-5 sm:p-6 rounded-2xl border-white/10 space-y-4">
                     <div class="flex justify-between items-center border-b border-white/10 pb-2">
                         <h3 class="text-base sm:text-lg font-bold text-white">${pkg.tier}</h3>
@@ -446,37 +633,33 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-1">Price</label>
-                        <input type="text" value="${pkg.price}" onchange="updatePackage(${index}, 'price', this.value)" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">
+                        <input type="text" value="${pkg.price || ''}" onchange="updatePackage(${index}, 'price', this.value)" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-1">Description</label>
-                        <textarea onchange="updatePackage(${index}, 'desc', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${pkg.desc}</textarea>
+                        <textarea onchange="updatePackage(${index}, 'desc', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${pkg.desc || ''}</textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-1">Features (Comma separated)</label>
-                        <textarea onchange="updatePackage(${index}, 'features', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${pkg.features.join(', ')}</textarea>
+                        <textarea onchange="updatePackage(${index}, 'features', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${(pkg.features || []).join(', ')}</textarea>
                     </div>
                 </div>
             `).join('');
         }
-
-        function updatePackage(index, field, value) {
-            const packages = JSON.parse(localStorage.getItem('webora_packages') || JSON.stringify(defaultPackages));
-            if (field === 'features') {
-                packages[index][field] = value.split(',').map(f => f.trim());
-            } else {
-                packages[index][field] = value;
-            }
-            localStorage.setItem('webora_packages', JSON.stringify(packages));
-            showToast("Package Updated", "Remember to save your changes.");
+        async function updatePackage(index, field, value) {
+            const list = Array.isArray(localData.packages) ? [...localData.packages] : Object.values(localData.packages || defaultPackages);
+            if (field === 'features') list[index][field] = value.split(',').map(f => f.trim()).filter(Boolean);
+            else list[index][field] = value;
+            await saveToFirebase('packages', list);
+            showToast("Package Updated", "Synced to Firebase instantly.");
         }
 
-        // --- SERVICES MANAGER ---
+        // ---------- SERVICES ----------
         function renderServicesAdmin() {
             const container = document.getElementById('servicesAdminGrid');
-            const services = JSON.parse(localStorage.getItem('webora_services') || JSON.stringify(defaultServices));
-
-            container.innerHTML = services.map((srv, index) => `
+            const services = localData.services || defaultServices;
+            const list = Array.isArray(services) ? services : Object.values(services);
+            container.innerHTML = list.map((srv, index) => `
                 <div class="glass-panel p-5 sm:p-6 rounded-2xl border-white/10 space-y-4">
                     <div class="flex items-center gap-3 border-b border-white/10 pb-2">
                         <i class="${srv.icon} text-xl ${srv.color}"></i>
@@ -484,38 +667,30 @@
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-1">Description</label>
-                        <textarea onchange="updateService(${index}, 'desc', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${srv.desc}</textarea>
+                        <textarea onchange="updateService(${index}, 'desc', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${srv.desc || ''}</textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-gray-400 mb-1">Features (Comma separated)</label>
-                        <textarea onchange="updateService(${index}, 'features', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${srv.features.join(', ')}</textarea>
+                        <textarea onchange="updateService(${index}, 'features', this.value)" rows="2" class="w-full px-3 py-2 rounded-lg bg-darkBg border border-white/10 text-white text-sm">${(srv.features || []).join(', ')}</textarea>
                     </div>
                 </div>
             `).join('');
         }
-
-        function updateService(index, field, value) {
-            const services = JSON.parse(localStorage.getItem('webora_services') || JSON.stringify(defaultServices));
-            if (field === 'features') {
-                services[index][field] = value.split(',').map(f => f.trim());
-            } else {
-                services[index][field] = value;
-            }
-            localStorage.setItem('webora_services', JSON.stringify(services));
-            showToast("Service Updated", "Remember to save your changes.");
+        async function updateService(index, field, value) {
+            const list = Array.isArray(localData.services) ? [...localData.services] : Object.values(localData.services || defaultServices);
+            if (field === 'features') list[index][field] = value.split(',').map(f => f.trim()).filter(Boolean);
+            else list[index][field] = value;
+            await saveToFirebase('services', list);
+            showToast("Service Updated", "Synced to Firebase instantly.");
         }
 
-        // --- PORTFOLIO MANAGER ---
+        // ---------- PORTFOLIO ----------
         function renderProjects() {
             const container = document.getElementById('projectsList');
-            const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
-
-            if (projects.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-500 text-sm py-4">No custom projects added yet.</div>`;
-                return;
-            }
-
-            container.innerHTML = projects.map((proj, index) => `
+            const projects = localData.projects || [];
+            const list = Array.isArray(projects) ? projects : Object.values(projects);
+            if (!list.length) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 text-sm py-4">No custom projects added yet.</div>`; return; }
+            container.innerHTML = list.map((proj, index) => `
                 <div class="glass-panel p-5 rounded-2xl flex flex-col justify-between border-purple-500/20 relative group">
                     <div>
                         <div class="flex justify-between items-start mb-2 gap-2">
@@ -526,62 +701,120 @@
                         <div class="text-[10px] text-gray-500 font-mono mb-4 truncate">${proj.tech}</div>
                     </div>
                     <div class="flex gap-2">
-                        <button onclick="previewCode(${index})" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition border border-white/10">Preview</button>
-                        <button onclick="deleteProject(${index})" class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs transition border border-red-500/20"><i class="fa-solid fa-trash"></i></button>
+                        <button onclick="previewCode(${index})" class="flex-1 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition border border-white/10" title="Preview">
+                            <i class="fa-solid fa-eye"></i> Preview
+                        </button>
+                        <button onclick="editProject(${index})" class="px-3 py-2 rounded-lg bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 text-xs transition border border-indigo-500/20" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </button>
+                        <button onclick="deleteProject(${index})" class="px-3 py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-red-400 text-xs transition border border-red-500/20" title="Delete">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
                     </div>
                 </div>
             `).join('');
         }
 
-        function handleAddProject(e) {
+        // Unified submit handler — handles both Add and Edit
+        async function handleProjectSubmit(e) {
             e.preventDefault();
-            const newProject = {
-                id: 'custom_' + Date.now(),
+            const editId = document.getElementById('projEditId').value;
+            const current = localData.projects || [];
+            let list = Array.isArray(current) ? [...current] : Object.values(current);
+
+            const projectData = {
                 title: document.getElementById('projTitle').value,
                 tag: document.getElementById('projTag').value.toLowerCase().trim(),
                 desc: document.getElementById('projDesc').value,
                 tech: document.getElementById('projTech').value,
                 icon: document.getElementById('projIcon').value,
-                code: document.getElementById('projCode').value,
+                code: document.getElementById('projCode').value
             };
 
-            const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
-            projects.unshift(newProject);
-            localStorage.setItem('webora_custom_projects', JSON.stringify(projects));
+            if (editId) {
+                // EDIT MODE
+                const idx = list.findIndex(p => p.id === editId);
+                if (idx > -1) {
+                    list[idx] = { ...list[idx], ...projectData };
+                }
+                await saveToFirebase('projects', list);
+                showToast("Project Updated!", "Changes live on the main site.");
+            } else {
+                // ADD MODE
+                projectData.id = 'custom_' + Date.now();
+                list.unshift(projectData);
+                await saveToFirebase('projects', list);
+                showToast("Project Published!", "Live on Firebase & the main site.");
+            }
 
-            document.getElementById('projectForm').reset();
+            resetProjectForm();
             renderProjects();
-            showToast("Project Published!", "It is now live on the main website.");
         }
 
-        function deleteProject(index) {
+        function editProject(index) {
+            const current = localData.projects || [];
+            const list = Array.isArray(current) ? current : Object.values(current);
+            const proj = list[index];
+            if (!proj) return;
+
+            document.getElementById('projEditId').value = proj.id || '';
+            document.getElementById('projTitle').value = proj.title || '';
+            document.getElementById('projTag').value = proj.tag || '';
+            document.getElementById('projDesc').value = proj.desc || '';
+            document.getElementById('projTech').value = proj.tech || '';
+            document.getElementById('projIcon').value = proj.icon || '';
+            document.getElementById('projCode').value = proj.code || '';
+
+            document.getElementById('projectFormTitle').innerHTML = '<i class="fa-solid fa-pen-to-square text-indigo-400"></i> Edit Project';
+            document.getElementById('projectSubmitLabel').textContent = 'Update Project';
+            document.getElementById('projectSubmitBtn').classList.remove('from-purplePrimary', 'to-indigoGlow');
+            document.getElementById('projectSubmitBtn').classList.add('from-indigo-600', 'to-indigo-500');
+            document.getElementById('projectCancelBtn').classList.remove('hidden');
+
+            document.getElementById('projectForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function cancelProjectEdit() {
+            resetProjectForm();
+        }
+
+        function resetProjectForm() {
+            document.getElementById('projectForm').reset();
+            document.getElementById('projEditId').value = '';
+            document.getElementById('projectFormTitle').innerHTML = '<i class="fa-solid fa-plus-circle text-purpleGlow"></i> Add New Project';
+            document.getElementById('projectSubmitLabel').textContent = 'Publish Project';
+            document.getElementById('projectSubmitBtn').classList.remove('from-indigo-600', 'to-indigo-500');
+            document.getElementById('projectSubmitBtn').classList.add('from-purplePrimary', 'to-indigoGlow');
+            document.getElementById('projectCancelBtn').classList.add('hidden');
+        }
+
+        async function deleteProject(index) {
             if (confirm("Delete this project?")) {
-                const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
-                projects.splice(index, 1);
-                localStorage.setItem('webora_custom_projects', JSON.stringify(projects));
+                const current = localData.projects || [];
+                const list = Array.isArray(current) ? [...current] : Object.values(current);
+                list.splice(index, 1);
+                await saveToFirebase('projects', list);
                 renderProjects();
             }
         }
 
         function previewCode(index) {
-            const projects = JSON.parse(localStorage.getItem('webora_custom_projects') || '[]');
-            const proj = projects[index];
-            const previewWindow = window.open('', '_blank');
-            previewWindow.document.write(proj.code);
-            previewWindow.document.close();
+            const current = localData.projects || [];
+            const list = Array.isArray(current) ? current : Object.values(current);
+            const proj = list[index];
+            if (!proj || !proj.code) { alert("No preview code available."); return; }
+            const w = window.open('', '_blank');
+            w.document.write(proj.code);
+            w.document.close();
         }
 
-        // --- REVIEWS MANAGER ---
+        // ---------- REVIEWS ----------
         function renderReviewsAdmin() {
             const container = document.getElementById('reviewsList');
-            const reviews = JSON.parse(localStorage.getItem('webora_reviews') || JSON.stringify(defaultReviews));
-
-            if (reviews.length === 0) {
-                container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-4">No reviews available.</div>`;
-                return;
-            }
-
-            container.innerHTML = reviews.map((rev, index) => `
+            const reviews = localData.reviews || defaultReviews;
+            const list = Array.isArray(reviews) ? reviews : Object.values(reviews);
+            if (!list.length) { container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-4">No reviews available.</div>`; return; }
+            container.innerHTML = list.map((rev, index) => `
                 <div class="glass-panel p-5 rounded-2xl border-white/10 relative group flex flex-col justify-between">
                     <div>
                         <div class="flex text-amber-400 gap-1 text-xs mb-2">
@@ -591,7 +824,7 @@
                     </div>
                     <div class="flex items-center justify-between border-t border-white/10 pt-3 mt-2">
                         <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full ${rev.color || 'bg-purplePrimary'} flex items-center justify-center font-bold text-white text-xs shrink-0">${rev.initial || rev.name.charAt(0)}</div>
+                            <div class="w-8 h-8 rounded-full ${rev.color || 'bg-purplePrimary'} flex items-center justify-center font-bold text-white text-xs shrink-0">${rev.initial || (rev.name || '?').charAt(0)}</div>
                             <div class="truncate">
                                 <div class="text-xs font-bold text-white truncate">${rev.name}</div>
                                 <div class="text-[10px] text-gray-400 truncate">${rev.company}</div>
@@ -602,8 +835,7 @@
                 </div>
             `).join('');
         }
-
-        function handleAddReview(e) {
+        async function handleAddReview(e) {
             e.preventDefault();
             const name = document.getElementById('revName').value;
             const newReview = {
@@ -613,47 +845,39 @@
                 initial: name.charAt(0).toUpperCase(),
                 color: "bg-purplePrimary"
             };
-
-            const reviews = JSON.parse(localStorage.getItem('webora_reviews') || JSON.stringify(defaultReviews));
-            reviews.unshift(newReview);
-            localStorage.setItem('webora_reviews', JSON.stringify(reviews));
-
+            const current = localData.reviews || defaultReviews;
+            const list = Array.isArray(current) ? [...current] : Object.values(current);
+            list.unshift(newReview);
+            await saveToFirebase('reviews', list);
             e.target.reset();
             renderReviewsAdmin();
-            showToast("Review Added", "It is now live on the website.");
+            showToast("Review Added", "Live on Firebase & the main site.");
         }
-
-        function deleteReview(index) {
+        async function deleteReview(index) {
             if (confirm("Delete this review?")) {
-                const reviews = JSON.parse(localStorage.getItem('webora_reviews') || JSON.stringify(defaultReviews));
-                reviews.splice(index, 1);
-                localStorage.setItem('webora_reviews', JSON.stringify(reviews));
+                const current = localData.reviews || defaultReviews;
+                const list = Array.isArray(current) ? [...current] : Object.values(current);
+                list.splice(index, 1);
+                await saveToFirebase('reviews', list);
                 renderReviewsAdmin();
             }
         }
 
-        // --- TOAST & RESET ---
+        // ---------- TOAST / RESET ----------
         function showToast(title, message) {
             const toast = document.getElementById('toast');
             document.getElementById('toastTitle').textContent = title;
             document.getElementById('toastMessage').textContent = message;
-
             toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
+            setTimeout(() => toast.classList.add('translate-y-20', 'opacity-0'), 3000);
         }
-
-        function resetAllData() {
-            if (confirm("Are you sure you want to reset all data to default? This will erase all custom inquiries, projects, and reviews.")) {
-                localStorage.clear();
-                window.location.reload();
-            }
+        async function resetAllData() {
+            if (!confirm("Reset ALL data to default? This erases everything from Firebase.")) return;
+            const defaults = { settings: defaultSettings, packages: defaultPackages, services: defaultServices, projects: [], reviews: defaultReviews, inquiries: [] };
+            for (const key of Object.keys(defaults)) await saveToFirebase(key, defaults[key]);
+            showToast("Reset Complete", "All data restored to defaults.");
+            setTimeout(() => window.location.reload(), 800);
         }
-
-        // --- INIT ---
-        initializeData();
-        switchTab('inquiries'); // Default tab
     </script>
 </body>
 
